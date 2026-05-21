@@ -106,7 +106,7 @@ To prevent screen sleep on Windows: Settings → Power → Screen → Never.
 
 ---
 
-## Refresh interval
+## Refresh intervals
 
 Default: **60 seconds**. To change, edit `INTERVAL` in `index.html`:
 
