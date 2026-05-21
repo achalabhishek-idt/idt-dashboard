@@ -20,26 +20,24 @@ app.http('jira', {
     };
 
     const jql = jqlMap[type] || jqlMap.all;
-    const maxResults = type === 'all' ? 100 : 50;
+const maxResults = type === 'all' ? 100 : 50;
 
-    const apiUrl = `${JIRA_BASE}/rest/api/3/search/jql`;
-    const requestBody = {
+const apiUrl = `${JIRA_BASE}/rest/api/3/search/jql`;
+
+try {
+  const res = await fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${AUTH}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
       jql,
       maxResults,
       fields: ['summary', 'status', 'assignee', 'duedate', 'priority']
-    };
-
-    try {
-      const res = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${AUTH}`,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody)
-      });
-
+    })
+  });
       const json = await res.json();
 
       return {
