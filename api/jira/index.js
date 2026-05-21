@@ -19,22 +19,25 @@ app.http('jira', {
       others:  `project = ${JIRA_PROJECT} AND assignee != "${JIRA_EMAIL}" AND assignee is not EMPTY ORDER BY updated DESC`,
     };
 
-const jql = jqlMap[type] || jqlMap.all;
-const maxResults = type === 'all' ? 100 : 50;
+    const jql = jqlMap[type] || jqlMap.all;
+    const maxResults = type === 'all' ? 100 : 50;
 
-const params = new URLSearchParams({ 
-  jql, 
-  maxResults,
-  'fields': 'summary,status,assignee,duedate,priority'
-});
-const apiUrl = `${JIRA_BASE}/rest/api/3/search/jql?${params}`;
+    const apiUrl = `${JIRA_BASE}/rest/api/3/search/jql`;
+    const requestBody = {
+      jql,
+      maxResults,
+      fields: ['summary', 'status', 'assignee', 'duedate', 'priority']
+    };
 
     try {
       const res = await fetch(apiUrl, {
+        method: 'POST',
         headers: {
           'Authorization': `Basic ${AUTH}`,
           'Accept': 'application/json',
-        }
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
       });
 
       const json = await res.json();
