@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<<<<<<< HEAD
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IDT Quality Dashboard</title>
@@ -485,6 +486,1682 @@ const INTERVAL = 60000;
 refresh();
 animateBar(INTERVAL);
 setInterval(() => { refresh(); animateBar(INTERVAL); }, INTERVAL);
+=======
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TW AI Dashboard — Subex IDT</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#eef2f6;--s1:#ffffff;--s2:#f3f6fa;--s3:#e7edf4;
+  --border:rgba(15,23,42,0.09);--border2:rgba(15,23,42,0.22);
+  --text:#111827;--text2:#334155;--text3:#64748b;
+  --teal:#0d9e72;--teal-d:rgba(13,158,114,0.10);
+  --amber:#c47f00;--amber-d:rgba(196,127,0,0.10);
+  --red:#d93025;--red-d:rgba(217,48,37,0.10);
+  --blue:#1a6fcf;--blue-d:rgba(26,111,207,0.10);
+  --purple:#6f3fbf;--purple-d:rgba(111,63,191,0.10);
+}
+body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;padding:0;}
+
+/* ── SETUP SCREEN ── */
+#setup{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100vh;padding:3rem 1.5rem;}
+.setup-logo{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--teal);font-weight:600;margin-bottom:8px;text-align:center;}
+.setup-title{font-size:26px;font-weight:600;letter-spacing:-0.02em;text-align:center;margin-bottom:6px;}
+.setup-sub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:2.5rem;}
+.setup-card{background:var(--s1);border:0.5px solid var(--border2);border-radius:14px;padding:2rem;width:100%;max-width:680px;}
+.section-head{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:6px;}
+.section-head::after{content:'';flex:1;height:0.5px;background:var(--border);}
+.field-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.field-group.full{grid-template-columns:1fr;}
+label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;}
+input[type=text],input[type=password],input[type=url]{
+  width:100%;background:var(--s2);border:0.5px solid var(--border2);border-radius:7px;
+  color:var(--text);font-family:'Sora',sans-serif;font-size:13px;padding:9px 12px;outline:none;
+  transition:border-color 0.15s;
+}
+input:focus{border-color:var(--teal);}
+input::placeholder{color:var(--text3);}
+.upload-zone{
+  background:var(--s2);border:0.5px dashed var(--border2);border-radius:8px;padding:14px 16px;
+  cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px;
+  font-size:12px;color:var(--text2);
+}
+.upload-zone:hover{border-color:var(--teal);color:var(--teal);}
+.upload-zone input{display:none;}
+.upload-zone .icon{font-size:18px;flex-shrink:0;}
+.file-tag{display:inline-flex;align-items:center;gap:6px;background:var(--teal-d);color:var(--teal);font-size:11px;padding:3px 10px;border-radius:20px;margin-top:6px;font-weight:500;}
+.divider{height:0.5px;background:var(--border);margin:1.5rem 0;}
+.btn-generate{
+  width:100%;padding:13px;background:var(--teal);color:#0d1117;font-family:'Sora',sans-serif;
+  font-size:14px;font-weight:600;border:none;border-radius:9px;cursor:pointer;
+  transition:all 0.15s;letter-spacing:0.01em;margin-top:1.5rem;
+}
+.btn-generate:hover{background:#52e5b8;}
+.btn-generate:disabled{opacity:0.4;cursor:not-allowed;}
+.hint{font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5;}
+.req{color:var(--red);font-weight:600;}
+.setup-flow{display:flex;flex-wrap:wrap;gap:8px;margin:0 auto 1.2rem;max-width:680px;justify-content:center;}
+.flow-chip{font-size:11px;color:var(--text2);background:var(--s1);border:0.5px solid var(--border);padding:5px 10px;border-radius:999px;}
+.status-line{font-size:12px;color:var(--text2);margin-top:10px;padding:8px 10px;background:var(--s2);border-radius:8px;border:0.5px solid var(--border);}
+.status-line strong{color:var(--text);}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;}
+.chip-btn{font-size:11px;padding:5px 10px;border-radius:999px;border:0.5px solid var(--border2);background:var(--s2);color:var(--text2);cursor:pointer;font-family:'Sora',sans-serif;}
+.chip-btn.active{background:var(--teal-d);color:var(--teal);border-color:rgba(13,158,114,0.32);}
+.source-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.source-item{background:var(--s2);border:0.5px solid var(--border);border-radius:8px;padding:10px;}
+.source-item .k{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;}
+.source-item .v{font-size:13px;color:var(--text);margin-top:3px;}
+.subtle{font-size:11px;color:var(--text3);}
+.action-table{width:100%;border-collapse:collapse;font-size:12px;}
+.action-table th{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);text-align:left;padding:0 10px 10px 0;border-bottom:0.5px solid var(--border);font-weight:500;}
+.action-table td{padding:9px 10px 9px 0;border-bottom:0.5px solid var(--border);color:var(--text2);vertical-align:top;}
+.prio-high{color:var(--red);font-weight:600;}
+.prio-med{color:var(--amber);font-weight:600;}
+.prio-low{color:var(--blue);font-weight:600;}
+
+/* ── LOADING ── */
+#loading{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:1.5rem;}
+.loader{width:44px;height:44px;border:2px solid var(--border2);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-steps{display:flex;flex-direction:column;gap:8px;width:300px;}
+.load-step{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:8px;transition:color 0.3s;}
+.load-step.active{color:var(--teal);}
+.load-step.done{color:var(--text2);}
+.load-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background 0.3s;}
+.load-step.active .load-dot{background:var(--teal);}
+.load-step.done .load-dot{background:var(--text2);}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none;padding:2rem;}
+.dash-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:0.5px solid var(--border);}
+.dash-org{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal);font-weight:500;margin-bottom:6px;}
+.dash-title{font-size:22px;font-weight:600;letter-spacing:-0.02em;}
+.dash-meta{font-size:12px;color:var(--text2);margin-top:4px;}
+.dash-actions{display:flex;gap:8px;flex-shrink:0;margin-top:4px;}
+.btn-sm{font-size:12px;font-weight:500;padding:7px 14px;border-radius:7px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:'Sora',sans-serif;transition:all 0.15s;}
+.btn-sm:hover{background:var(--s2);color:var(--text);}
+.btn-sm.primary{background:var(--teal-d);color:var(--teal);border-color:rgba(57,217,168,0.25);}
+
+/* summary cards */
+.summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:1.5rem;}
+.metric-card{background:var(--s1);border:0.5px solid var(--border);border-radius:10px;padding:1.1rem;text-align:center;}
+.metric-card .lbl{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
+.metric-card .val{font-size:28px;font-weight:600;line-height:1;font-family:'JetBrains Mono',monospace;}
+.metric-card .note{font-size:11px;color:var(--text3);margin-top:5px;}
+.c-teal{color:var(--teal)}.c-amber{color:var(--amber)}.c-red{color:var(--red)}.c-blue{color:var(--blue)}.c-text{color:var(--text)}
+
+/* panels */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+.panel{background:var(--s1);border:0.5px solid var(--border);border-radius:12px;padding:1.4rem;}
+.panel-title{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:1.2rem;font-weight:600;}
+.dashboard-card{box-shadow:0 10px 28px rgba(15,23,42,0.06);}
+
+.queue-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.queue-box{background:var(--s2);border:0.5px solid var(--border);border-radius:10px;padding:10px;}
+.queue-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px;color:var(--text2);font-weight:600;letter-spacing:0.03em;}
+.queue-list{display:flex;flex-direction:column;gap:7px;max-height:230px;overflow:auto;padding-right:2px;}
+.queue-item{padding:8px 9px;border-radius:8px;background:#fff;border:0.5px solid var(--border);}
+.queue-item .t{font-size:12px;color:var(--text);line-height:1.45;}
+.queue-item .m{font-size:10px;color:var(--text3);margin-top:3px;display:flex;gap:7px;flex-wrap:wrap;}
+.timeline-list{display:flex;flex-direction:column;gap:8px;max-height:298px;overflow:auto;padding-right:2px;}
+.timeline-item{display:grid;grid-template-columns:105px 1fr;gap:10px;align-items:start;padding:9px;border-radius:9px;background:var(--s2);border:0.5px solid var(--border);}
+.timeline-date{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--blue);font-weight:500;}
+.timeline-title{font-size:12px;color:var(--text);line-height:1.4;}
+.timeline-meta{font-size:10px;color:var(--text3);margin-top:3px;}
+
+/* jira table */
+.jira-table{width:100%;border-collapse:collapse;font-size:12px;}
+.jira-table th{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);text-align:left;padding:0 10px 10px 0;border-bottom:0.5px solid var(--border);font-weight:500;}
+.jira-table td{padding:9px 10px 9px 0;border-bottom:0.5px solid var(--border);color:var(--text2);vertical-align:top;}
+.jira-table tr:last-child td{border-bottom:none;}
+.jira-key{font-family:'JetBrains Mono',monospace;color:var(--blue);font-size:11px;}
+.story-title{color:var(--text);font-size:12px;max-width:260px;}
+.pill{font-size:10px;font-weight:500;padding:2px 9px;border-radius:20px;white-space:nowrap;display:inline-block;}
+.pill-done{background:var(--teal-d);color:var(--teal);}
+.pill-prog{background:var(--amber-d);color:var(--amber);}
+.pill-todo{background:var(--border);color:var(--text2);}
+.pill-block{background:var(--red-d);color:var(--red);}
+.pill-review{background:var(--purple-d);color:var(--purple);}
+
+/* insights */
+.insight-list{display:flex;flex-direction:column;gap:10px;}
+.insight-item{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:var(--text2);padding:10px;background:var(--s2);border-radius:8px;}
+.insight-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+
+/* rubric */
+.rubric-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2);}
+.rubric-row:last-child{border-bottom:none;}
+
+/* bar */
+.bar-row{margin-bottom:14px;}.bar-row:last-child{margin-bottom:0;}
+.bar-meta{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:var(--text2);}
+.bar-pct{font-weight:600;font-family:'JetBrains Mono',monospace;}
+.bar-track{background:rgba(255,255,255,0.05);border-radius:4px;height:6px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;}
+
+/* error */
+.error-box{background:var(--red-d);border:0.5px solid rgba(248,81,73,0.3);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--red);margin-top:10px;display:none;}
+.sp-tab{font-size:11px;font-weight:500;padding:5px 12px;border-radius:6px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:'Sora',sans-serif;transition:all 0.15s;}
+.sp-tab.active{background:var(--blue-d);color:var(--blue);border-color:rgba(88,166,255,0.3);}
+.sp-tab:hover:not(.active){background:var(--s2);color:var(--text);}
+
+@media (max-width: 1024px) {
+  .summary-grid{grid-template-columns:repeat(3,1fr);}
+}
+
+@media (max-width: 760px) {
+  #setup{padding:1.2rem;}
+  .setup-card{padding:1.1rem;}
+  .field-group{grid-template-columns:1fr;}
+  #dashboard{padding:1rem;}
+  .dash-header{flex-direction:column;gap:10px;}
+  .dash-actions{width:100%;flex-wrap:wrap;}
+  .summary-grid{grid-template-columns:1fr 1fr;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+  .source-grid{grid-template-columns:1fr;}
+}
+
+@media (max-width: 480px) {
+  .summary-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ SETUP ═══════════════════════════════════ -->
+<div id="setup">
+  <p class="setup-logo">Subex · IDT</p>
+  <h1 class="setup-title">IDT Live Dashboard</h1>
+  <p class="setup-sub">Add your API key, connect any available data source, then generate.</p>
+  <div class="setup-flow">
+    <span class="flow-chip">1. Add Claude API key</span>
+    <span class="flow-chip">2. Connect Jira / SharePoint / Files (any one or more)</span>
+    <span class="flow-chip">3. Generate dashboard</span>
+  </div>
+
+  <div class="setup-card">
+
+    <!-- Anthropic Key -->
+    <p class="section-head">Claude API</p>
+    <div class="field-group full" style="margin-bottom:4px;">
+      <div>
+        <label>Anthropic API Key <span class="req">*</span></label>
+        <input type="password" id="api-key" placeholder="sk-ant-..." />
+      </div>
+    </div>
+    <p class="hint">Required. Your key is never stored and is used only in this browser session.</p>
+
+    <div class="divider"></div>
+
+    <!-- Jira -->
+    <p class="section-head">Jira</p>
+    <div class="field-group">
+      <div>
+        <label>Jira Base URL</label>
+        <input type="url" id="jira-url" placeholder="https://subex.atlassian.net" />
+      </div>
+      <div>
+        <label>Project Key(s)</label>
+        <input type="text" id="jira-project" placeholder="IDT, ROC, DOC" />
+      </div>
+    </div>
+    <div class="field-group">
+      <div>
+        <label>Jira Email</label>
+        <input type="text" id="jira-email" placeholder="achal@subex.com" />
+      </div>
+      <div>
+        <label>API Token</label>
+        <input type="password" id="jira-token" placeholder="your Jira API token" />
+      </div>
+    </div>
+    <p class="hint">Optional. If you use Jira API, fill all Jira fields. You can add multiple project keys separated by commas (example: IDT, ROC). Or skip and upload Jira CSV below.</p>
+
+    <div class="divider"></div>
+
+    <!-- Google Analytics -->
+    <p class="section-head">Google Analytics</p>
+    <div class="field-group">
+      <div>
+        <label>GA Export CSV URL</label>
+        <input type="url" id="ga-csv-url" placeholder="https://.../ga_help_pages.csv" />
+      </div>
+      <div>
+        <label>Help Page Filter (optional)</label>
+        <input type="text" id="ga-help-filter" placeholder="/help/ or /docs/" />
+      </div>
+    </div>
+    <div class="field-group full">
+      <div>
+        <label>GA File Upload (recommended if URL fails)</label>
+        <label class="upload-zone" id="zone-ga">
+          <input type="file" id="file-ga" accept=".csv,.xlsx,.xls" onchange="handleFile(this,'zone-ga','tag-ga')">
+          <span class="icon">📈</span>
+          <span>Drop GA CSV/XLSX export here</span>
+        </label>
+        <div id="tag-ga"></div>
+      </div>
+    </div>
+    <p class="hint">Optional connector. Paste a direct CSV export URL from GA4/Looker Studio. If set, it will be fetched and included in dashboard analysis.</p>
+
+    <div class="divider"></div>
+
+    <!-- SharePoint -->
+    <p class="section-head">SharePoint</p>
+
+    <!-- Mode tabs -->
+    <div style="display:flex;gap:6px;margin-bottom:14px;" id="sp-tabs">
+      <button class="sp-tab active" onclick="setSpTab('list')" id="tab-list">📋 List / Library</button>
+      <button class="sp-tab" onclick="setSpTab('file')" id="tab-file">📄 File URL</button>
+      <button class="sp-tab" onclick="setSpTab('graph')" id="tab-graph">🔷 Graph API</button>
+    </div>
+
+    <!-- Mode: List -->
+    <div id="sp-list">
+      <div class="field-group">
+        <div>
+          <label>SharePoint Site URL</label>
+          <input type="url" id="sp-site" placeholder="https://subex.sharepoint.com/sites/IDT" />
+        </div>
+        <div>
+          <label>List / Library Name</label>
+          <input type="text" id="sp-list-name" placeholder="TW Metrics" />
+        </div>
+      </div>
+      <p class="hint">Recommended mode. Uses your current browser session and needs no token.</p>
+    </div>
+
+    <!-- Mode: File URL -->
+    <div id="sp-file" style="display:none;">
+      <div class="field-group full">
+        <div>
+          <label>Direct Download URL (SharePoint Excel / CSV)</label>
+          <input type="url" id="sp-file-url" placeholder="https://subex.sharepoint.com/sites/IDT/Shared%20Documents/metrics.xlsx?download=1" />
+        </div>
+      </div>
+      <p class="hint">Paste a direct SharePoint file link (.xlsx, .csv, .json). Uses your existing browser session.</p>
+    </div>
+
+    <!-- Mode: Graph API -->
+    <div id="sp-graph" style="display:none;">
+      <div class="field-group">
+        <div>
+          <label>Microsoft Graph Bearer Token</label>
+          <input type="password" id="sp-graph-token" placeholder="eyJ0eXAiOiJKV1..." />
+        </div>
+        <div>
+          <label>SharePoint Site ID or Drive Item URL</label>
+          <input type="text" id="sp-graph-url" placeholder="/sites/subex.sharepoint.com:/sites/IDT" />
+        </div>
+      </div>
+      <p class="hint">Advanced option. Get token from <a href="https://developer.microsoft.com/en-us/graph/graph-explorer" target="_blank" rel="noopener noreferrer" style="color:var(--blue);">Graph Explorer</a> after sign-in.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- File uploads -->
+    <p class="section-head">Data Files (optional)</p>
+    <div class="field-group">
+      <div>
+        <label>Excel / CSV — Metrics</label>
+        <label class="upload-zone" id="zone-excel">
+          <input type="file" id="file-excel" accept=".xlsx,.xls,.csv" onchange="handleFile(this,'zone-excel','tag-excel')">
+          <span class="icon">📊</span>
+          <span>Drop metrics file here</span>
+        </label>
+        <div id="tag-excel"></div>
+        <p class="hint">Expected columns: coverage%, stale%, automation%, review_days, score, sprint data.</p>
+      </div>
+      <div>
+        <label>Jira Export CSV (if no API)</label>
+        <label class="upload-zone" id="zone-jira">
+          <input type="file" id="file-jira" accept=".csv,.xlsx" onchange="handleFile(this,'zone-jira','tag-jira')">
+          <span class="icon">🗂</span>
+          <span>Drop Jira export here</span>
+        </label>
+        <div id="tag-jira"></div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div>
+        <label>SharePoint / Local — Any extra files</label>
+        <label class="upload-zone" id="zone-extra">
+          <input type="file" id="file-extra" accept=".xlsx,.xls,.csv,.txt,.json" multiple onchange="handleFile(this,'zone-extra','tag-extra')">
+          <span class="icon">📁</span>
+          <span>Drop one or more extra data files</span>
+        </label>
+        <div id="tag-extra"></div>
+      </div>
+      <div>
+        <label>Engineers' Hub Analytics File</label>
+        <label class="upload-zone" id="zone-enghub">
+          <input type="file" id="file-enghub" accept=".xlsx,.xls,.csv" onchange="handleFile(this,'zone-enghub','tag-enghub')">
+          <span class="icon">🧪</span>
+          <span>Drop Engineers' Hub analytics file</span>
+        </label>
+        <div id="tag-enghub"></div>
+      </div>
+    </div>
+
+    <div class="field-group full">
+      <div>
+        <label>Paste raw data or notes (optional)</label>
+        <textarea id="paste-data" placeholder="Paste any raw data, notes, or executive briefing points here…" style="width:100%;height:82px;background:var(--s2);border:0.5px solid var(--border2);border-radius:7px;color:var(--text);font-family:'Sora',sans-serif;font-size:12px;padding:9px 12px;outline:none;resize:none;line-height:1.5;"></textarea>
+      </div>
+    </div>
+
+    <div id="error-box" class="error-box"></div>
+    <p id="setup-status" class="status-line">Waiting for API key.</p>
+
+    <button class="btn-generate" id="btn-gen" onclick="generateDashboard()" disabled>
+      Add API key to continue
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ LOADING ═══════════════════════════════════ -->
+<div id="loading">
+  <div class="loader"></div>
+  <div class="load-steps">
+    <div class="load-step" id="ls1"><div class="load-dot"></div>Connecting to Jira…</div>
+    <div class="load-step" id="ls2"><div class="load-dot"></div>Fetching SharePoint data…</div>
+    <div class="load-step" id="ls3"><div class="load-dot"></div>Reading uploaded files…</div>
+    <div class="load-step" id="ls4"><div class="load-dot"></div>Preparing timeline forecast…</div>
+    <div class="load-step" id="ls5"><div class="load-dot"></div>Analyzing data with Claude…</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ DASHBOARD ═══════════════════════════════════ -->
+<div id="dashboard">
+  <div class="dash-header">
+    <div>
+      <p class="dash-org">Subex · Information Development Team</p>
+      <h1 class="dash-title" id="d-title">Documentation Quality Dashboard</h1>
+      <p class="dash-meta" id="d-meta"></p>
+    </div>
+    <div class="dash-actions">
+      <button class="btn-sm" id="d-badge-el">Loading…</button>
+      <button class="btn-sm" id="btn-toggle-confidence" onclick="toggleConfidencePanel()">Show Confidence</button>
+      <button class="btn-sm" onclick="document.getElementById('dashboard').style.display='none';document.getElementById('setup').style.display='flex';">← Refresh data</button>
+      <button class="btn-sm primary" onclick="window.print()">Print / PDF</button>
+    </div>
+  </div>
+
+  <!-- Summary metrics -->
+  <div class="panel dashboard-card" id="confidence-panel" style="margin-bottom:12px;display:none;">
+    <p class="panel-title">🧭 Data Confidence & Filters (Optional)</p>
+    <div class="source-grid" id="d-sources"></div>
+    <div style="margin-top:10px;">
+      <p class="subtle" style="margin-bottom:6px;">Product/Track filter (applies to Jira stories)</p>
+      <div class="chip-row" id="d-track-filters"></div>
+    </div>
+  </div>
+
+  <div class="summary-grid" id="d-summary"></div>
+
+  <div class="grid2">
+    <!-- Estate health -->
+    <div class="panel">
+      <p class="panel-title">📄 Estate Health</p>
+      <div id="d-estate"></div>
+    </div>
+    <!-- Velocity chart -->
+    <div class="panel">
+      <p class="panel-title">🚀 Team Velocity</p>
+      <div style="position:relative;height:200px;"><canvas id="velocityChart" role="img" aria-label="Team velocity chart"></canvas></div>
+      <div class="legend" id="v-legend" style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:var(--text2);"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <!-- Business impact -->
+    <div class="panel">
+      <p class="panel-title">📈 Business Impact</p>
+      <div id="d-impact"></div>
+    </div>
+    <!-- Rubric -->
+    <div class="panel">
+      <p class="panel-title">✅ Quality Rubric Status</p>
+      <div id="d-rubric"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel dashboard-card">
+      <p class="panel-title">📋 Work Queue Snapshot</p>
+      <div class="queue-grid" id="d-queue"></div>
+    </div>
+    <div class="panel dashboard-card">
+      <p class="panel-title">🗓 Upcoming Timeline Forecast</p>
+      <div class="timeline-list" id="d-timeline"></div>
+    </div>
+  </div>
+
+  <!-- Jira stories -->
+  <div class="panel" style="margin-bottom:12px;">
+    <p class="panel-title">🗂 Jira User Stories — Documentation Tasks</p>
+    <p class="subtle" style="margin-bottom:6px;">Jira tag segregation (labels)</p>
+    <div class="chip-row" id="d-jira-tag-filters" style="margin-bottom:10px;"></div>
+    <div id="d-jira" style="overflow-x:auto;"></div>
+  </div>
+
+  <!-- SharePoint data -->
+  <div class="panel" style="margin-bottom:12px;" id="sp-panel">
+    <p class="panel-title">🔷 SharePoint Data</p>
+    <div id="d-sharepoint"></div>
+  </div>
+
+  <!-- AI Insights -->
+  <div class="panel" style="margin-bottom:12px;">
+    <p class="panel-title">🧩 Recommended Action Plan</p>
+    <div id="d-actions"></div>
+  </div>
+
+  <div class="panel" style="margin-bottom:12px;">
+    <p class="panel-title">✦ Claude's Recommendations</p>
+    <div class="insight-list" id="d-insights"></div>
+  </div>
+</div>
+
+<script>
+// ── File reading ──────────────────────────────────────────────────────────────
+const fileData = { excel: null, jira: null, extra: null, ga: null, enghub: null };
+let selectedTrack = 'All';
+let selectedJiraTag = 'All';
+let jiraSort = { column: '', direction: 'asc' };
+let rawDashData = null;
+let dashboardMeta = null;
+let showConfidencePanel = false;
+
+function hasAnyFileData() {
+  return Boolean((fileData.excel && fileData.excel.length) || (fileData.jira && fileData.jira.length) || (fileData.extra && fileData.extra.length) || (fileData.ga && fileData.ga.length) || (fileData.enghub && fileData.enghub.length));
+}
+
+function getActiveSharePointTab() {
+  return document.querySelector('.sp-tab.active')?.id?.replace('tab-','') || 'list';
+}
+
+function getSetupState() {
+  const apiKey = document.getElementById('api-key').value.trim();
+  const jira = {
+    url: document.getElementById('jira-url').value.trim(),
+    project: document.getElementById('jira-project').value.trim(),
+    email: document.getElementById('jira-email').value.trim(),
+    token: document.getElementById('jira-token').value.trim()
+  };
+  const ga = {
+    csvUrl: document.getElementById('ga-csv-url').value.trim(),
+    helpFilter: document.getElementById('ga-help-filter').value.trim()
+  };
+  const spTab = getActiveSharePointTab();
+  const sp = {
+    site: document.getElementById('sp-site').value.trim(),
+    listName: document.getElementById('sp-list-name').value.trim(),
+    fileUrl: document.getElementById('sp-file-url').value.trim(),
+    graphToken: document.getElementById('sp-graph-token').value.trim(),
+    graphUrl: document.getElementById('sp-graph-url').value.trim()
+  };
+  const pasted = document.getElementById('paste-data').value.trim();
+
+  return { apiKey, jira, ga, sp, spTab, pasted };
+}
+
+function validateSetup(showMessage = false) {
+  const { apiKey, jira, ga, sp, spTab } = getSetupState();
+  if (!apiKey) {
+    if (showMessage) showError('Please enter your Anthropic API key.');
+    return { valid: false, reason: 'missingApi' };
+  }
+
+  const jiraValues = [jira.url, jira.project, jira.email, jira.token].filter(Boolean).length;
+  if (jiraValues > 0 && jiraValues < 4) {
+    if (showMessage) showError('For Jira API, fill all fields: Base URL, Project Key, Email, and API Token. Or clear them and upload Jira CSV.');
+    return { valid: false, reason: 'partialJira' };
+  }
+
+  if (ga.csvUrl && !/^https?:\/\//i.test(ga.csvUrl)) {
+    if (showMessage) showError('Google Analytics CSV URL should start with http:// or https://');
+    return { valid: false, reason: 'invalidGaUrl' };
+  }
+
+  if (spTab === 'list') {
+    const values = [sp.site, sp.listName].filter(Boolean).length;
+    if (values === 1) {
+      if (showMessage) showError('For SharePoint List mode, fill both Site URL and List/Library Name.');
+      return { valid: false, reason: 'partialSpList' };
+    }
+  }
+  if (spTab === 'file' && sp.fileUrl && !/^https?:\/\//i.test(sp.fileUrl)) {
+    if (showMessage) showError('SharePoint file URL should start with http:// or https://');
+    return { valid: false, reason: 'invalidSpFileUrl' };
+  }
+  if (spTab === 'graph') {
+    const values = [sp.graphToken, sp.graphUrl].filter(Boolean).length;
+    if (values === 1) {
+      if (showMessage) showError('For Graph mode, provide both Bearer Token and Site ID/URL path.');
+      return { valid: false, reason: 'partialSpGraph' };
+    }
+  }
+
+  return { valid: true, reason: 'ok' };
+}
+
+function updateSetupStatus() {
+  const btn = document.getElementById('btn-gen');
+  const status = document.getElementById('setup-status');
+  const errBox = document.getElementById('error-box');
+  const { apiKey, jira, ga, sp, spTab, pasted } = getSetupState();
+
+  if (!apiKey) {
+    btn.disabled = true;
+    btn.textContent = 'Add API key to continue';
+    status.innerHTML = '<strong>Next:</strong> Enter your Anthropic API key.';
+    return;
+  }
+
+  const jiraConnected = Boolean(jira.url && jira.project && jira.email && jira.token) || Boolean(fileData.jira && fileData.jira.length);
+  const gaConnected = Boolean(ga.csvUrl) || Boolean(fileData.ga && fileData.ga.length);
+  const spConnected = (spTab === 'list' && sp.site && sp.listName) || (spTab === 'file' && sp.fileUrl) || (spTab === 'graph' && sp.graphToken && sp.graphUrl);
+  const filesConnected = hasAnyFileData();
+  const notesConnected = Boolean(pasted);
+
+  const connected = [];
+  if (jiraConnected) connected.push('Jira');
+  if (gaConnected) connected.push('Google Analytics');
+  if (spConnected) connected.push('SharePoint');
+  if (filesConnected) connected.push('Files');
+  if (notesConnected) connected.push('Notes');
+
+  const validation = validateSetup(false);
+  btn.disabled = !validation.valid;
+  btn.textContent = validation.valid ? 'Generate Dashboard' : 'Complete required fields';
+
+  if (!validation.valid) {
+    status.innerHTML = '<strong>Check inputs:</strong> Some connected sections are incomplete.';
+  } else if (connected.length === 0) {
+    status.innerHTML = '<strong>Ready:</strong> API key added. You can generate now (sample metrics will be used), or connect sources for better accuracy.';
+    errBox.style.display = 'none';
+  } else {
+    status.innerHTML = `<strong>Ready:</strong> Connected sources: ${connected.join(', ')}.`;
+    errBox.style.display = 'none';
+  }
+}
+
+function configureLoadingLabels() {
+  const { jira, ga, sp, spTab } = getSetupState();
+  const jiraEnabled = Boolean(jira.url && jira.project && jira.email && jira.token) || Boolean(fileData.jira && fileData.jira.length);
+  const gaEnabled = Boolean(ga.csvUrl) || Boolean(fileData.ga && fileData.ga.length);
+  const spEnabled = (spTab === 'list' && sp.site && sp.listName) || (spTab === 'file' && sp.fileUrl) || (spTab === 'graph' && sp.graphToken && sp.graphUrl);
+  const filesEnabled = hasAnyFileData();
+
+  document.getElementById('ls1').innerHTML = `<div class="load-dot"></div>${jiraEnabled ? 'Connecting to Jira…' : 'Skipping Jira…'}`;
+  document.getElementById('ls2').innerHTML = `<div class="load-dot"></div>${spEnabled ? 'Fetching SharePoint data…' : 'Skipping SharePoint…'}`;
+  document.getElementById('ls3').innerHTML = `<div class="load-dot"></div>${filesEnabled ? 'Reading uploaded files…' : 'Checking local inputs…'}`;
+  document.getElementById('ls4').innerHTML = `<div class="load-dot"></div>${gaEnabled ? 'Fetching Google Analytics data…' : 'Preparing timeline forecast…'}`;
+  document.getElementById('ls5').innerHTML = `<div class="load-dot"></div>Analyzing data with Claude…`;
+}
+
+function setupDropZone(zoneId, inputId) {
+  const zone = document.getElementById(zoneId);
+  const input = document.getElementById(inputId);
+  if (!zone || !input) return;
+
+  ['dragenter', 'dragover'].forEach(evt => zone.addEventListener(evt, e => {
+    e.preventDefault();
+    zone.style.borderColor = 'var(--teal)';
+    zone.style.color = 'var(--teal)';
+  }));
+
+  ['dragleave', 'drop'].forEach(evt => zone.addEventListener(evt, e => {
+    e.preventDefault();
+    zone.style.borderColor = 'var(--border2)';
+    zone.style.color = 'var(--text2)';
+  }));
+
+  zone.addEventListener('drop', e => {
+    const files = e.dataTransfer?.files;
+    if (!files || !files.length) return;
+    input.files = files;
+    input.dispatchEvent(new Event('change'));
+  });
+}
+
+function initSetupUi() {
+  const ids = ['api-key','jira-url','jira-project','jira-email','jira-token','ga-csv-url','ga-help-filter','sp-site','sp-list-name','sp-file-url','sp-graph-token','sp-graph-url','paste-data'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', updateSetupStatus);
+    el.addEventListener('blur', updateSetupStatus);
+  });
+
+  setupDropZone('zone-excel', 'file-excel');
+  setupDropZone('zone-jira', 'file-jira');
+  setupDropZone('zone-extra', 'file-extra');
+  setupDropZone('zone-ga', 'file-ga');
+  setupDropZone('zone-enghub', 'file-enghub');
+
+  document.getElementById('paste-data').addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      generateDashboard();
+    }
+  });
+
+  updateSetupStatus();
+}
+
+// ── SharePoint tab switcher ───────────────────────────────────────────────────
+function setSpTab(mode) {
+  ['list','file','graph'].forEach(m => {
+    document.getElementById(`sp-${m}`).style.display = m === mode ? 'block' : 'none';
+    document.getElementById(`tab-${m}`).classList.toggle('active', m === mode);
+  });
+  updateSetupStatus();
+}
+
+// ── SharePoint fetch ──────────────────────────────────────────────────────────
+async function fetchSharePoint() {
+  const activeTab = document.querySelector('.sp-tab.active')?.id?.replace('tab-','');
+  let spData = null;
+  let spError = null;
+
+  try {
+    if (activeTab === 'list') {
+      const siteUrl = document.getElementById('sp-site').value.trim().replace(/\/$/, '');
+      const listName = document.getElementById('sp-list-name').value.trim();
+      if (!siteUrl || !listName) return { data: null, error: null };
+
+      const endpoint = `${siteUrl}/_api/web/lists/getbytitle('${encodeURIComponent(listName)}')/items?$top=100&$format=json`;
+      const resp = await fetch(endpoint, {
+        credentials: 'include',
+        headers: { 'Accept': 'application/json;odata=verbose' }
+      });
+      if (!resp.ok) throw new Error(`SharePoint List API ${resp.status} — are you logged in to SharePoint in this browser?`);
+      const json = await resp.json();
+      spData = (json.d?.results || json.value || []).map(item => {
+        const clean = {};
+        Object.keys(item).forEach(k => {
+          if (!k.startsWith('__') && !k.includes('@odata') && !k.includes('odata.')) clean[k] = item[k];
+        });
+        return clean;
+      });
+
+    } else if (activeTab === 'file') {
+      const fileUrl = document.getElementById('sp-file-url').value.trim();
+      if (!fileUrl) return { data: null, error: null };
+
+      const resp = await fetch(fileUrl, { credentials: 'include' });
+      if (!resp.ok) throw new Error(`SharePoint file fetch ${resp.status}`);
+      const contentType = resp.headers.get('content-type') || '';
+
+      if (fileUrl.endsWith('.csv') || contentType.includes('text')) {
+        const text = await resp.text();
+        const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+        spData = parsed.data;
+      } else {
+        const buf = await resp.arrayBuffer();
+        const wb = XLSX.read(buf, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        spData = XLSX.utils.sheet_to_json(ws);
+      }
+
+    } else if (activeTab === 'graph') {
+      const token = document.getElementById('sp-graph-token').value.trim();
+      const sitePath = document.getElementById('sp-graph-url').value.trim();
+      if (!token || !sitePath) return { data: null, error: null };
+
+      // Fetch SharePoint site lists via Graph
+      const siteResp = await fetch(`https://graph.microsoft.com/v1.0${sitePath}/lists?$expand=items($expand=fields)`, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+      });
+      if (!siteResp.ok) throw new Error(`Graph API ${siteResp.status} — check your token and site path`);
+      const json = await siteResp.json();
+      // Flatten first list's items
+      const lists = json.value || [];
+      spData = lists.slice(0, 3).map(list => ({
+        listName: list.displayName,
+        itemCount: list.items?.length || 0,
+        items: (list.items || []).slice(0, 20).map(i => i.fields || {})
+      }));
+    }
+  } catch(e) {
+    spError = e.message;
+  }
+
+  return { data: spData, error: spError };
+}
+
+function readLocalFileRows(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        if (file.name.endsWith('.csv') || file.name.endsWith('.txt')) {
+          const result = Papa.parse(e.target.result, { header: true, skipEmptyLines: true });
+          resolve(result.data || []);
+        } else {
+          const wb = XLSX.read(e.target.result, { type: 'binary' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          resolve(XLSX.utils.sheet_to_json(ws) || []);
+        }
+      } catch (err) {
+        reject(err);
+      }
+    };
+    reader.onerror = () => reject(new Error('file-read-failed'));
+    if (file.name.endsWith('.csv') || file.name.endsWith('.txt')) {
+      reader.readAsText(file);
+    } else {
+      reader.readAsBinaryString(file);
+    }
+  });
+}
+
+async function handleFile(input, zoneId, tagId) {
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
+  const key = zoneId.replace('zone-','');
+  const tag = document.getElementById(tagId);
+  const label = files.length === 1
+    ? `📎 ${files[0].name}`
+    : `📎 ${files.length} files selected`;
+  tag.innerHTML = `<span class="file-tag">${label}</span>`;
+
+  try {
+    const parts = await Promise.all(files.map(readLocalFileRows));
+    const merged = parts.flat().filter(r => r && typeof r === 'object');
+    fileData[key] = merged;
+    if (files.length > 1) {
+      tag.innerHTML = `<span class="file-tag">📎 ${files.length} files loaded (${merged.length} rows)</span>`;
+    }
+  } catch (err) {
+    tag.innerHTML = `<span class="file-tag" style="background:var(--red-d);color:var(--red);">⚠ Could not read one or more files</span>`;
+  }
+
+  updateSetupStatus();
+}
+
+// ── Jira fetch ────────────────────────────────────────────────────────────────
+function parseProjectKeys(projectsInput) {
+  return projectsInput
+    .split(',')
+    .map(p => p.trim().toUpperCase())
+    .filter(Boolean)
+    .filter((p, i, arr) => arr.indexOf(p) === i);
+}
+
+async function fetchJira(baseUrl, project, email, token) {
+  const projectKeys = parseProjectKeys(project);
+  if (!projectKeys.length) throw new Error('Please provide at least one Jira project key.');
+
+  const auth = btoa(`${email}:${token}`);
+  const projectClause = projectKeys.length === 1
+    ? `project = ${projectKeys[0]}`
+    : `project IN (${projectKeys.join(',')})`;
+  const jql = encodeURIComponent(`${projectClause} AND issuetype="Story" ORDER BY updated DESC`);
+  const url = `${baseUrl.replace(/\/$/, '')}/rest/api/3/search?jql=${jql}&maxResults=50&fields=summary,status,assignee,priority,labels,duedate,customfield_10016,description`;
+  const resp = await fetch(url, {
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Accept': 'application/json'
+    }
+  });
+  if (!resp.ok) throw new Error(`Jira API ${resp.status}: ${resp.statusText}`);
+  const data = await resp.json();
+  return data.issues || [];
+}
+
+function pickFirst(row, keys) {
+  for (const k of keys) {
+    if (row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== '') return row[k];
+  }
+  return '';
+}
+
+function numValue(v) {
+  const n = Number(String(v || '').replace(/,/g, ''));
+  return Number.isFinite(n) ? n : 0;
+}
+
+async function fetchGoogleAnalyticsCsv(csvUrl, helpFilter) {
+  if (!csvUrl) return { data: null, error: null };
+
+  try {
+    const resp = await fetch(csvUrl, { credentials: 'include' });
+    if (!resp.ok) throw new Error(`GA CSV fetch ${resp.status}`);
+    const text = await resp.text();
+    const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+    const rows = parsed.data || [];
+    return { data: buildGoogleAnalyticsPayload(rows, helpFilter), error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
+  }
+}
+
+function buildGoogleAnalyticsPayload(rows, helpFilter) {
+  const normalized = (rows || []).map(r => {
+    const pageTitle = pickFirst(r, ['Page title', 'page_title', 'Page Title', 'pageTitle', 'Landing page + query string']);
+    const pagePath = pickFirst(r, ['Page path', 'page_path', 'Page path + query string', 'Landing page', 'pagePath']);
+    const views = numValue(pickFirst(r, ['Views', 'views', 'Screen page views', 'Pageviews', 'pageviews']));
+    const users = numValue(pickFirst(r, ['Users', 'users', 'Active users', 'activeUsers']));
+    const engagementRate = numValue(pickFirst(r, ['Engagement rate', 'engagement_rate']));
+    const avgEngagementTime = pickFirst(r, ['Average engagement time', 'avg_engagement_time', 'Avg engagement time']);
+    const date = pickFirst(r, ['Date', 'date']);
+    return { pageTitle, pagePath, views, users, engagementRate, avgEngagementTime, date };
+  });
+
+  const filterText = (helpFilter || '').toLowerCase().trim();
+  const filtered = filterText
+    ? normalized.filter(r => `${r.pageTitle} ${r.pagePath}`.toLowerCase().includes(filterText))
+    : normalized;
+
+  const sorted = filtered.slice().sort((a, b) => b.views - a.views);
+  const totalViews = sorted.reduce((s, r) => s + r.views, 0);
+  const totalUsers = sorted.reduce((s, r) => s + r.users, 0);
+
+  return {
+    totalRows: sorted.length,
+    totalViews,
+    totalUsers,
+    helpFilter: helpFilter || '',
+    topPages: sorted.slice(0, 20)
+  };
+}
+
+function normalizeDateInput(raw) {
+  if (!raw) return '';
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toISOString().slice(0, 10);
+}
+
+function mapJiraPlanningStories(stories) {
+  const mapped = (stories || []).map(s => {
+    const f = s.fields || {};
+    const labels = Array.isArray(f.labels)
+      ? f.labels
+      : (Array.isArray(s.labels) ? s.labels : String(s.labels || '').split(',').map(x => x.trim()).filter(Boolean));
+    return {
+      key: s.key || '',
+      title: f.summary || s.title || '',
+      status: f.status?.name || s.status || 'To Do',
+      assignee: f.assignee?.displayName || s.assignee || 'Unassigned',
+      priority: f.priority?.name || s.priority || '-',
+      dueDate: normalizeDateInput(f.duedate || s.due_date || s.dueDate || ''),
+      labels: labels.map(l => String(l).trim()).filter(Boolean)
+    };
+  }).filter(s => s.key || s.title);
+
+  const dedup = new Map();
+  mapped.forEach(s => {
+    const k = s.key || `${s.title}|${s.status}`;
+    if (!dedup.has(k)) dedup.set(k, s);
+  });
+  return Array.from(dedup.values());
+}
+
+function mergeJiraMetadataIntoDashboardStories(modelStories, planningStories) {
+  const metaByKey = new Map((planningStories || []).filter(s => s.key).map(s => [s.key, { dueDate: s.dueDate, labels: s.labels || [] }]));
+  return (modelStories || []).map(s => ({
+    ...s,
+    due_date: s.due_date || metaByKey.get(s.key)?.dueDate || '',
+    labels: Array.isArray(s.labels) && s.labels.length ? s.labels : (metaByKey.get(s.key)?.labels || [])
+  }));
+}
+
+function getWorkflowBucket(status) {
+  const t = (status || '').toLowerCase();
+  if (t.includes('done') || t.includes('closed') || t.includes('resolved') || t.includes('complete')) return 'done';
+  if (t.includes('progress') || t.includes('review') || t.includes('qa') || t.includes('testing') || t.includes('develop')) return 'progress';
+  return 'backlog';
+}
+
+function formatFriendlyDate(isoDate) {
+  if (!isoDate) return 'No due date';
+  const d = new Date(isoDate);
+  if (Number.isNaN(d.getTime())) return 'No due date';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function renderWorkQueue(planningStories) {
+  const host = document.getElementById('d-queue');
+  const backlog = (planningStories || []).filter(s => getWorkflowBucket(s.status) === 'backlog').slice(0, 10);
+  const inProgress = (planningStories || []).filter(s => getWorkflowBucket(s.status) === 'progress').slice(0, 10);
+
+  const renderItems = (rows, emptyText) => {
+    if (!rows.length) return `<div class="subtle">${emptyText}</div>`;
+    return `<div class="queue-list">${rows.map(r => `
+      <div class="queue-item">
+        <div class="t">${r.key ? `[${r.key}] ` : ''}${r.title || 'Untitled task'}</div>
+        <div class="m"><span>${r.assignee || 'Unassigned'}</span><span>${r.priority || '-'}</span><span>${formatFriendlyDate(r.dueDate)}</span></div>
+      </div>
+    `).join('')}</div>`;
+  };
+
+  host.innerHTML = `
+    <div class="queue-box">
+      <div class="queue-head"><span>In Backlog</span><span>${backlog.length}</span></div>
+      ${renderItems(backlog, 'No backlog stories detected.')}
+    </div>
+    <div class="queue-box">
+      <div class="queue-head"><span>Currently In Progress</span><span>${inProgress.length}</span></div>
+      ${renderItems(inProgress, 'No in-progress stories detected.')}
+    </div>`;
+}
+
+function renderTimelineForecast(planningStories) {
+  const host = document.getElementById('d-timeline');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const upcoming = (planningStories || [])
+    .filter(s => s.dueDate && getWorkflowBucket(s.status) !== 'done')
+    .map(s => ({ ...s, dueObj: new Date(s.dueDate) }))
+    .filter(s => !Number.isNaN(s.dueObj.getTime()) && s.dueObj >= today)
+    .sort((a, b) => a.dueObj - b.dueObj)
+    .slice(0, 14);
+
+  if (!upcoming.length) {
+    host.innerHTML = `<div class="subtle">Add Jira due dates to see forecasted upcoming work here.</div>`;
+    return;
+  }
+
+  host.innerHTML = upcoming.map(s => {
+    const days = Math.ceil((s.dueObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const eta = days <= 0 ? 'Today' : (days === 1 ? '1 day left' : `${days} days left`);
+    return `
+      <div class="timeline-item">
+        <div class="timeline-date">${formatFriendlyDate(s.dueDate)}</div>
+        <div>
+          <div class="timeline-title">${s.key ? `[${s.key}] ` : ''}${s.title || 'Untitled task'}</div>
+          <div class="timeline-meta">${s.status || 'Backlog'} | ${s.assignee || 'Unassigned'} | ${eta}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleConfidencePanel(forceState) {
+  if (typeof forceState === 'boolean') {
+    showConfidencePanel = forceState;
+  } else {
+    showConfidencePanel = !showConfidencePanel;
+  }
+  const panel = document.getElementById('confidence-panel');
+  const btn = document.getElementById('btn-toggle-confidence');
+  if (panel) panel.style.display = showConfidencePanel ? 'block' : 'none';
+  if (btn) btn.textContent = showConfidencePanel ? 'Hide Confidence' : 'Show Confidence';
+}
+
+function parseClaudeJsonText(raw) {
+  const cleaned = (raw || '').replace(/```json|```/g, '').trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch (_) {
+    const start = cleaned.indexOf('{');
+    const end = cleaned.lastIndexOf('}');
+    if (start !== -1 && end !== -1 && end > start) {
+      return JSON.parse(cleaned.slice(start, end + 1));
+    }
+    throw new Error('Model returned non-JSON output.');
+  }
+}
+
+function normalizeDashboardData(d) {
+  const x = d || {};
+  const fixNum = (n, fallback = 0) => Number.isFinite(Number(n)) ? Number(n) : fallback;
+  const clampPct = n => Math.max(0, Math.min(100, fixNum(n)));
+
+  return {
+    title: x.title || 'Documentation Quality Dashboard',
+    generated_at: 'Till Date',
+    overall_score: clampPct(x.overall_score ?? 0),
+    overall_status: ['Healthy', 'Needs Attention', 'Critical'].includes(x.overall_status) ? x.overall_status : 'Needs Attention',
+    summary_metrics: Array.isArray(x.summary_metrics) ? x.summary_metrics.slice(0, 5) : [],
+    estate_health: Array.isArray(x.estate_health) ? x.estate_health.slice(0, 6).map(e => ({ ...e, pct: clampPct(e?.pct ?? 0) })) : [],
+    velocity: {
+      labels: Array.isArray(x.velocity?.labels) ? x.velocity.labels.slice(0, 6) : ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'],
+      delivered: Array.isArray(x.velocity?.delivered) ? x.velocity.delivered.slice(0, 6).map(v => fixNum(v, 0)) : [0, 0, 0, 0, 0, 0],
+      rework: Array.isArray(x.velocity?.rework) ? x.velocity.rework.slice(0, 6).map(v => fixNum(v, 0)) : [0, 0, 0, 0, 0, 0]
+    },
+    impact_cards: Array.isArray(x.impact_cards) ? x.impact_cards.slice(0, 4) : [],
+    rubric: Array.isArray(x.rubric) ? x.rubric.slice(0, 9) : [],
+    jira_stories: Array.isArray(x.jira_stories) ? x.jira_stories.slice(0, 50) : [],
+    insights: Array.isArray(x.insights) ? x.insights.slice(0, 7) : []
+  };
+}
+
+async function getDashboardFromClaude(prompt, apiKey) {
+  let lastErr = null;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 3000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error?.message || `API error ${resp.status}`);
+      }
+      const result = await resp.json();
+      const raw = result.content?.[0]?.text || '';
+      return normalizeDashboardData(parseClaudeJsonText(raw));
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error('Unable to get valid dashboard data from Claude.');
+}
+
+function getTrackFromText(text) {
+  const t = (text || '').toLowerCase();
+  const map = [
+    ['Platform', ['platform']],
+    ['DMS', ['dms']],
+    ['Subscriber', ['subscriber']],
+    ['BMS', ['bms']],
+    ['PAS', ['pas']],
+    ['BIS', ['bis']],
+    ['ITOPS', ['itops', 'it ops']],
+    ['DAT', ['dat']],
+    ['HS NAM/PEM', ['hs nam', 'hs pem', 'nam', 'pem']],
+    ['ROC', ['roc', 'roc ps', 'roc ra', 'roc fm']]
+  ];
+  const hit = map.find(([_, keys]) => keys.some(k => t.includes(k)));
+  return hit ? hit[0] : 'General';
+}
+
+function getTrackOptions(stories) {
+  const set = new Set(['All']);
+  (stories || []).forEach(s => set.add(getTrackFromText(`${s.title || ''} ${(s.key || '')}`)));
+  return Array.from(set);
+}
+
+function filterStoriesByTrack(stories, track) {
+  if (!track || track === 'All') return stories || [];
+  return (stories || []).filter(s => getTrackFromText(`${s.title || ''} ${(s.key || '')}`) === track);
+}
+
+function getStoryLabels(story) {
+  if (Array.isArray(story?.labels)) return story.labels.map(x => String(x).trim()).filter(Boolean);
+  if (typeof story?.labels === 'string') return story.labels.split(',').map(x => x.trim()).filter(Boolean);
+  return [];
+}
+
+function getJiraTagOptions(stories) {
+  const set = new Set(['All']);
+  (stories || []).forEach(s => getStoryLabels(s).forEach(l => set.add(l)));
+  const tags = Array.from(set);
+  const head = tags.filter(t => /^idt[-_]/i.test(t));
+  const tail = tags.filter(t => t !== 'All' && !/^idt[-_]/i.test(t));
+  head.sort((a, b) => a.localeCompare(b));
+  tail.sort((a, b) => a.localeCompare(b));
+  return ['All', ...head, ...tail];
+}
+
+function filterStoriesByTag(stories, tag) {
+  if (!tag || tag === 'All') return stories || [];
+  return (stories || []).filter(s => getStoryLabels(s).some(l => l.toLowerCase() === tag.toLowerCase()));
+}
+
+function filterStories(stories) {
+  return filterStoriesByTag(filterStoriesByTrack(stories, selectedTrack), selectedJiraTag);
+}
+
+function renderJiraTagFilters(stories) {
+  const host = document.getElementById('d-jira-tag-filters');
+  if (!host) return;
+  const options = getJiraTagOptions(stories);
+  if (!options.includes(selectedJiraTag)) selectedJiraTag = 'All';
+  host.innerHTML = options.map(tag => {
+    const count = tag === 'All' ? (stories || []).length : filterStoriesByTag(stories, tag).length;
+    const safeTag = tag.replace(/'/g, "\\'");
+    return `<button class="chip-btn ${tag === selectedJiraTag ? 'active' : ''}" onclick="setJiraTagFilter('${safeTag}')">${tag} (${count})</button>`;
+  }).join('');
+}
+
+function setJiraTagFilter(tag) {
+  selectedJiraTag = tag;
+  if (rawDashData) renderDashboard(rawDashData, dashboardMeta);
+}
+
+function setJiraSort(column) {
+  if (jiraSort.column === column) {
+    jiraSort.direction = jiraSort.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    jiraSort.column = column;
+    jiraSort.direction = column === 'due_date' ? 'asc' : 'asc';
+  }
+  if (rawDashData) renderDashboard(rawDashData, dashboardMeta);
+}
+
+function sortStories(stories) {
+  const rows = [...(stories || [])];
+  if (!jiraSort.column) return rows;
+  const dir = jiraSort.direction === 'asc' ? 1 : -1;
+  const col = jiraSort.column;
+
+  rows.sort((a, b) => {
+    const avRaw = col === 'labels' ? getStoryLabels(a).join(', ') : (a[col] ?? '');
+    const bvRaw = col === 'labels' ? getStoryLabels(b).join(', ') : (b[col] ?? '');
+
+    if (col === 'due_date') {
+      const av = new Date(avRaw || '9999-12-31').getTime();
+      const bv = new Date(bvRaw || '9999-12-31').getTime();
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    }
+
+    const av = String(avRaw).toLowerCase();
+    const bv = String(bvRaw).toLowerCase();
+    if (av < bv) return -1 * dir;
+    if (av > bv) return 1 * dir;
+    return 0;
+  });
+
+  return rows;
+}
+
+function getSortIndicator(column) {
+  if (jiraSort.column !== column) return '';
+  return jiraSort.direction === 'asc' ? ' ▲' : ' ▼';
+}
+
+function renderTrackFilters(stories) {
+  const host = document.getElementById('d-track-filters');
+  const options = getTrackOptions(stories);
+  if (!options.includes(selectedTrack)) selectedTrack = 'All';
+  host.innerHTML = options.map(track =>
+    `<button class="chip-btn ${track === selectedTrack ? 'active' : ''}" onclick="setTrackFilter('${track.replace(/'/g, "\\'")}')">${track}</button>`
+  ).join('');
+}
+
+function setTrackFilter(track) {
+  selectedTrack = track;
+  if (rawDashData) renderDashboard(rawDashData, dashboardMeta);
+}
+
+function renderSourceMeta(meta, visibleCount, totalCount) {
+  const el = document.getElementById('d-sources');
+  const confColor = meta.confidence === 'High' ? 'var(--teal)' : meta.confidence === 'Medium' ? 'var(--amber)' : 'var(--red)';
+  const activeFilter = selectedTrack || 'All';
+  const activeTag = selectedJiraTag || 'All';
+  el.innerHTML = `
+    <div class="source-item">
+      <div class="k">Confidence</div>
+      <div class="v" style="color:${confColor};font-weight:600;">${meta.confidence}</div>
+      <div class="subtle">Updated ${meta.generatedAt}</div>
+    </div>
+    <div class="source-item">
+      <div class="k">Sources Used</div>
+      <div class="v">${meta.usedSources.join(', ') || 'Fallback defaults'}</div>
+      <div class="subtle">Track: ${activeFilter} | Tag: ${activeTag}</div>
+    </div>
+    <div class="source-item">
+      <div class="k">Jira Coverage</div>
+      <div class="v">${visibleCount}/${totalCount} stories visible</div>
+      <div class="subtle">API: ${meta.jiraApiStatus} | CSV: ${meta.jiraCsvStatus}</div>
+    </div>
+    <div class="source-item">
+      <div class="k">Data Freshness</div>
+      <div class="v">${meta.freshnessNote}</div>
+      <div class="subtle">GA: ${meta.gaStatus} | SharePoint: ${meta.sharePointStatus}</div>
+    </div>`;
+}
+
+function getActionsFromInsights(insights) {
+  const today = new Date();
+  return (insights || []).slice(0, 5).map((i, idx) => {
+    const t = (i.text || '').toLowerCase();
+    const priority = /urgent|high|critical|block|stale|delay/.test(t) ? 'High' : (/improve|reduce|increase|adopt|standardize/.test(t) ? 'Medium' : 'Low');
+    const owner = /jira|sprint|release/.test(t) ? 'IDT Lead' : (/ai|search|automation/.test(t) ? 'IDT + Engineering' : 'Info Developer');
+    const due = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (priority === 'High' ? 7 : priority === 'Medium' ? 14 : 21));
+    const dueText = due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return {
+      action: i.text || `Action item ${idx + 1}`,
+      owner,
+      due: dueText,
+      priority,
+      status: idx === 0 ? 'In progress' : 'Planned'
+    };
+  });
+}
+
+function renderActionPlan(insights) {
+  const rows = getActionsFromInsights(insights);
+  const el = document.getElementById('d-actions');
+  if (!rows.length) {
+    el.innerHTML = `<p style="font-size:12px;color:var(--text3);">No action items available.</p>`;
+    return;
+  }
+  el.innerHTML = `<table class="action-table"><thead><tr><th>Action</th><th>Owner</th><th>Due</th><th>Priority</th><th>Status</th></tr></thead><tbody>${rows.map(r => `
+    <tr>
+      <td>${r.action}</td>
+      <td>${r.owner}</td>
+      <td>${r.due}</td>
+      <td class="${r.priority === 'High' ? 'prio-high' : r.priority === 'Medium' ? 'prio-med' : 'prio-low'}">${r.priority}</td>
+      <td>${r.status}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+// ── Step indicator ────────────────────────────────────────────────────────────
+function setStep(n) {
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById(`ls${i}`);
+    if (i < n) { el.className = 'load-step done'; }
+    else if (i === n) { el.className = 'load-step active'; }
+    else { el.className = 'load-step'; }
+  }
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+async function generateDashboard() {
+  const apiKey = document.getElementById('api-key').value.trim();
+  const errBox = document.getElementById('error-box');
+  errBox.style.display = 'none';
+
+  const validation = validateSetup(true);
+  if (!validation.valid) return;
+
+  configureLoadingLabels();
+
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('loading').style.display = 'flex';
+
+  let jiraStories = [];
+  let jiraError = null;
+  let gaData = null;
+  let gaError = null;
+
+  // Step 1 — Jira
+  setStep(1);
+  const jiraUrl = document.getElementById('jira-url').value.trim();
+  const jiraProject = document.getElementById('jira-project').value.trim();
+  const jiraEmail = document.getElementById('jira-email').value.trim();
+  const jiraToken = document.getElementById('jira-token').value.trim();
+
+  if (jiraUrl && jiraEmail && jiraToken) {
+    try {
+      jiraStories = await fetchJira(jiraUrl, jiraProject, jiraEmail, jiraToken);
+    } catch(e) {
+      jiraError = e.message + ' (CORS may block browser→Jira calls — use Jira CSV export instead)';
+    }
+  }
+
+  // Also parse uploaded jira CSV
+  if (fileData.jira && fileData.jira.length > 0) {
+    const csvStories = fileData.jira.map(r => ({
+      key: r['Issue key'] || r['Key'] || r['ID'] || '',
+      fields: {
+        summary: r['Summary'] || r['Title'] || r['summary'] || '',
+        status: { name: r['Status'] || r['status'] || 'To Do' },
+        assignee: { displayName: r['Assignee'] || r['assignee'] || '' },
+        priority: { name: r['Priority'] || '' },
+        labels: (r['Labels'] || '').split(',').filter(Boolean),
+        duedate: r['Due Date'] || r['Due date'] || r['Due'] || r['duedate'] || ''
+      }
+    }));
+    jiraStories = [...jiraStories, ...csvStories];
+  }
+
+  const planningStories = mapJiraPlanningStories(jiraStories);
+  window._planningStories = planningStories;
+
+  await sleep(400);
+
+  // Step 2 — SharePoint
+  setStep(2);
+  const { data: spData, error: spError } = await fetchSharePoint();
+  await sleep(300);
+
+  // Step 3 — Files
+  setStep(3);
+  await sleep(300);
+
+  // Step 4 — Forecast
+  setStep(4);
+  const gaCsvUrl = document.getElementById('ga-csv-url').value.trim();
+  const gaHelpFilter = document.getElementById('ga-help-filter').value.trim();
+  if (fileData.ga && fileData.ga.length > 0) {
+    gaData = buildGoogleAnalyticsPayload(fileData.ga, gaHelpFilter);
+  } else if (gaCsvUrl) {
+    const gaRes = await fetchGoogleAnalyticsCsv(gaCsvUrl, gaHelpFilter);
+    gaData = gaRes.data;
+    gaError = gaRes.error;
+  }
+  await sleep(220);
+
+  // Step 5 — Send to Claude
+  setStep(5);
+
+  const contextParts = [];
+  contextParts.push(`You are analyzing documentation quality data for Achal, Lead Technical Writer on the Information Development Team (IDT) at Subex Ltd., Bengaluru. Team size: 10+ writers. Coverage spans multiple Subex product lines and tracks (including Platform, DMS, Subscriber, BMS, PAS, BIS, ITOPS, DAT, HS modules, and ROC suite streams).
+
+IDT scope and responsibilities:
+- Create, maintain, and deliver technical documentation across Subex products.
+- Sprint documentation updates for web help across product tracks.
+- Post-release documentation for ROC suite streams, including User Guide, Installation Guide, Admin Guide, and Data Modelling Guide.
+- Support ad-hoc documentation requests from Delivery, GDO, and Engineering.
+- Coordinate requirements with Engineering, track tasks in MS Teams and Jira, communicate milestones to stakeholders, and manage project access dependencies (Jira, Swift, Git).
+
+Current team focus:
+- Enhancing help experience and context-sensitive help.
+- Docs-as-code transformation and Git-based workflows.
+- AI and semantic search for documentation discovery.
+- Engineers hub/community enablement.
+- Standardization and quality governance.
+
+Expected value outcomes:
+- Better product usability and understandability.
+- Reduced SME dependency via structured content.
+- Improved onboarding, support, delivery efficiency, and process adherence.`);
+
+  if (jiraStories.length > 0) {
+    const storySummary = jiraStories.slice(0, 30).map(s => {
+      const f = s.fields || {};
+      return `[${s.key}] "${f.summary || ''}" | Status: ${f.status?.name || '?'} | Assignee: ${f.assignee?.displayName || 'unassigned'} | Priority: ${f.priority?.name || '-'} | Due: ${f.duedate || '-'} | Labels: ${(f.labels||[]).join(',')||'-'}`;
+    }).join('\n');
+    contextParts.push(`\n\n## JIRA STORIES (${jiraStories.length} total, showing up to 30):\n${storySummary}`);
+  } else if (jiraError) {
+    contextParts.push(`\n\n## JIRA: Could not fetch (${jiraError}). Generate sample/placeholder data.`);
+  } else {
+    contextParts.push(`\n\n## JIRA: No Jira data provided. Generate representative sample stories for a TW documentation team.`);
+  }
+
+  if (spData) {
+    contextParts.push(`\n\n## SHAREPOINT DATA:\n${JSON.stringify(spData.slice ? spData.slice(0, 30) : spData, null, 2)}`);
+  } else if (spError) {
+    contextParts.push(`\n\n## SHAREPOINT: Could not fetch (${spError}). Ignore and use other data sources.`);
+  }
+
+  if (gaData) {
+    contextParts.push(`\n\n## GOOGLE ANALYTICS HELP PAGES:\n${JSON.stringify(gaData, null, 2)}`);
+  } else if (gaError) {
+    contextParts.push(`\n\n## GOOGLE ANALYTICS: Could not fetch (${gaError}). Ignore and use other data sources.`);
+  }
+
+  if (fileData.excel) {
+    contextParts.push(`\n\n## METRICS FILE DATA:\n${JSON.stringify(fileData.excel.slice(0,20), null, 2)}`);
+  }
+  if (fileData.extra) {
+    contextParts.push(`\n\n## EXTRA DATA FILE:\n${JSON.stringify(fileData.extra.slice(0,20), null, 2)}`);
+  }
+  if (fileData.enghub) {
+    contextParts.push(`\n\n## ENGINEERS HUB ANALYTICS:\n${JSON.stringify(fileData.enghub.slice(0,20), null, 2)}`);
+  }
+  const pasteData = document.getElementById('paste-data').value.trim();
+  if (pasteData) {
+    contextParts.push(`\n\n## PASTED DATA / NOTES:\n${pasteData}`);
+  }
+
+  if (!fileData.excel && !pasteData) {
+    contextParts.push(`\n\n## NOTE: No metrics file provided. Use realistic defaults aligned to IDT priorities across multiple Subex products: overall_doc_coverage=76%, stale_content=24%, context_sensitive_help_coverage=63%, roc_release_doc_readiness=84%, docs_as_code_adoption=61%, git_workflow_adoption=66%, semantic_search_success=78%, terminology_consistency=88%, process_adherence=82%, avg_review_days=3.1, overall_score=69. Sprint velocity last 6 sprints docs_delivered=[13,16,12,18,15,20], rework=[3,2,3,2,2,1]. Business impact defaults: help_page_views=4300/mo, support_ticket_trend=-16%, engineers_hub_members=365, onboarding_doc_self_serve=72%.`);
+  }
+
+  const prompt = `${contextParts.join('')}
+
+Based on all the above data, generate a documentation quality dashboard as a JSON object. Respond ONLY with valid JSON, no markdown, no backticks, no explanation.
+
+The JSON must have this exact structure:
+{
+  "title": "string",
+  "generated_at": "string (use 'Till Date')",
+  "overall_score": number (0-100),
+  "overall_status": "Healthy|Needs Attention|Critical",
+  "summary_metrics": [
+    {"label": "string", "value": "string", "note": "string", "color": "teal|amber|red|blue|text"}
+  ],
+  "estate_health": [
+    {"label": "string", "pct": number, "color": "teal|amber|red|blue", "note": "string"}
+  ],
+  "velocity": {
+    "labels": ["S1","S2","S3","S4","S5","S6"],
+    "delivered": [number,number,number,number,number,number],
+    "rework": [number,number,number,number,number,number]
+  },
+  "impact_cards": [
+    {"label": "string", "value": "string", "color": "teal|amber|red|blue|text"}
+  ],
+  "rubric": [
+    {"label": "string", "status": "Good|In progress|Action needed|Not started"}
+  ],
+  "jira_stories": [
+    {"key": "string", "title": "string", "status": "string", "assignee": "string", "priority": "string", "due_date": "YYYY-MM-DD or empty"}
+  ],
+  "insights": [
+    {"icon": "string (single emoji)", "text": "string (actionable recommendation, 1-2 sentences)"}
+  ]
+}
+
+Rules:
+- summary_metrics: exactly 5 items
+- estate_health: 5-6 bars
+- velocity: exactly 6 sprints
+- impact_cards: exactly 4 cards
+- rubric: 7-9 items
+- jira_stories: up to 15 most relevant doc-related stories
+- insights: exactly 5 actionable recommendations based on the data
+- All numbers must be actual numbers not strings (except "value" in summary_metrics and impact_cards which can be strings like "74%" or "4.2K")
+- Make insights specific and actionable based on the actual data provided`;
+
+  let dashData;
+  try {
+    dashData = await getDashboardFromClaude(prompt, apiKey);
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('setup').style.display = 'flex';
+    showError('Claude API error: ' + e.message);
+    return;
+  }
+
+  // Render
+  await sleep(200);
+
+  const usedSources = [];
+  if (jiraStories.length) usedSources.push('Jira');
+  if (gaData && gaData.totalRows) usedSources.push('Google Analytics');
+  if (spData && spData.length) usedSources.push('SharePoint');
+  if (fileData.excel || fileData.extra || fileData.jira || fileData.ga || fileData.enghub) usedSources.push('Files');
+  if (pasteData) usedSources.push('Notes');
+  if (!usedSources.length) usedSources.push('Fallback defaults');
+
+  const confidence = usedSources.includes('Jira') && (usedSources.includes('SharePoint') || usedSources.includes('Files'))
+    ? 'High'
+    : (usedSources.length >= 2 ? 'Medium' : 'Low');
+
+  const meta = {
+    confidence,
+    generatedAt: new Date().toLocaleString(),
+    usedSources,
+    jiraApiStatus: jiraStories.length ? 'Connected' : (jiraError ? 'Error' : 'Skipped'),
+    gaStatus: gaData ? `Loaded (${gaData.totalRows})` : (gaError ? 'Error' : 'Skipped'),
+    jiraCsvStatus: fileData.jira ? 'Loaded' : 'Not uploaded',
+    sharePointStatus: spData ? `Loaded (${spData.length})` : (spError ? 'Error' : 'Skipped'),
+    freshnessNote: 'Based on latest available fetch/upload in this session'
+  };
+
+  dashData.jira_stories = mergeJiraMetadataIntoDashboardStories(dashData.jira_stories, planningStories);
+  window._lastSpData = spData;
+  rawDashData = dashData;
+  dashboardMeta = meta;
+  renderDashboard(dashData, meta);
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderDashboard(d, meta = dashboardMeta || { confidence: 'Low', generatedAt: '-', usedSources: [], jiraApiStatus: 'Skipped', gaStatus: 'Skipped', jiraCsvStatus: 'Not uploaded', sharePointStatus: 'Skipped', freshnessNote: '-' }) {
+  // header
+  document.getElementById('d-title').textContent = d.title || 'Documentation Quality Dashboard';
+  document.getElementById('d-meta').textContent = d.generated_at || '';
+  const badge = document.getElementById('d-badge-el');
+  const statusColor = d.overall_status === 'Healthy' ? 'var(--teal)' : d.overall_status === 'Critical' ? 'var(--red)' : 'var(--amber)';
+  badge.textContent = d.overall_status || 'Needs Attention';
+  badge.style.color = statusColor;
+  badge.style.background = d.overall_status === 'Healthy' ? 'var(--teal-d)' : d.overall_status === 'Critical' ? 'var(--red-d)' : 'var(--amber-d)';
+
+  // summary
+  const sumEl = document.getElementById('d-summary');
+  sumEl.innerHTML = (d.summary_metrics || []).map(m => `
+    <div class="metric-card">
+      <div class="lbl">${m.label}</div>
+      <div class="val c-${m.color || 'text'}">${m.value}</div>
+      <div class="note">${m.note || ''}</div>
+    </div>`).join('');
+
+  // estate
+  const estEl = document.getElementById('d-estate');
+  estEl.innerHTML = (d.estate_health || []).map(b => {
+    const clr = b.color === 'teal' ? 'var(--teal)' : b.color === 'amber' ? 'var(--amber)' : b.color === 'red' ? 'var(--red)' : 'var(--blue)';
+    return `<div class="bar-row">
+      <div class="bar-meta"><span>${b.label}</span><span class="bar-pct" style="color:${clr}">${b.pct}%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${b.pct}%;background:${clr};"></div></div>
+      ${b.note ? `<div class="bar-note" style="font-size:10px;color:var(--text3);margin-top:3px;">${b.note}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // velocity chart
+  const vel = d.velocity || {};
+  if (window._velChart) window._velChart.destroy();
+  window._velChart = new Chart(document.getElementById('velocityChart'), {
+    type: 'bar',
+    data: {
+      labels: vel.labels || [],
+      datasets: [
+        { label: 'Docs delivered', data: vel.delivered || [], backgroundColor: 'rgba(13,158,114,0.80)', borderRadius: 4, borderSkipped: false },
+        { label: 'Rework count', data: vel.rework || [], backgroundColor: 'rgba(196,127,0,0.75)', borderRadius: 4, borderSkipped: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#ffffff', borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1, titleColor: '#1a1d23', bodyColor: '#5a6070', padding: 10 } },
+      scales: {
+        x: { ticks: { color: '#9aa0b0', font: { family: 'Sora', size: 11 } }, grid: { display: false }, border: { display: false } },
+        y: { ticks: { color: '#9aa0b0', font: { family: 'JetBrains Mono', size: 11 }, stepSize: 5 }, grid: { color: 'rgba(0,0,0,0.06)' }, border: { display: false } }
+      }
+    }
+  });
+  document.getElementById('v-legend').innerHTML = `
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--teal);display:inline-block;"></span>Docs delivered</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--amber);display:inline-block;"></span>Rework count</span>`;
+
+  // impact
+  const impEl = document.getElementById('d-impact');
+  impEl.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;">` +
+    (d.impact_cards || []).map(c => `
+      <div style="background:var(--s2);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:22px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--${c.color||'text'})">${c.value}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:0.06em;">${c.label}</div>
+      </div>`).join('') + `</div>`;
+
+  // rubric
+  const pilMap = { 'Good': 'pill-done', 'In progress': 'pill-prog', 'Action needed': 'pill-block', 'Not started': 'pill-review' };
+  document.getElementById('d-rubric').innerHTML = (d.rubric || []).map(r =>
+    `<div class="rubric-row"><span>${r.label}</span><span class="pill ${pilMap[r.status]||'pill-todo'}">${r.status}</span></div>`
+  ).join('');
+
+  const allStories = (window._planningStories && window._planningStories.length)
+    ? window._planningStories.map(s => ({
+        key: s.key || '',
+        title: s.title || '',
+        status: s.status || 'To Do',
+        assignee: s.assignee || 'Unassigned',
+        priority: s.priority || '-',
+        due_date: s.dueDate || '',
+        labels: s.labels || []
+      }))
+    : (d.jira_stories || []);
+  renderTrackFilters(allStories);
+  renderJiraTagFilters(allStories);
+  const visibleStories = filterStories(allStories);
+  const sortedStories = sortStories(visibleStories);
+  renderSourceMeta(meta, visibleStories.length, allStories.length);
+  toggleConfidencePanel(showConfidencePanel);
+  renderWorkQueue(window._planningStories || []);
+  renderTimelineForecast(window._planningStories || []);
+
+  // sharepoint panel — render raw data as a table if available
+  const spEl = document.getElementById('d-sharepoint');
+  const spPanel = document.getElementById('sp-panel');
+  if (window._lastSpData && window._lastSpData.length > 0) {
+    spPanel.style.display = 'block';
+    const rows = window._lastSpData.slice(0, 15);
+    const cols = Object.keys(rows[0] || {}).filter(k => !k.includes('odata') && !k.startsWith('_')).slice(0, 8);
+    spEl.innerHTML = `<div style="overflow-x:auto;"><table class="jira-table">
+      <thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r => `<tr>${cols.map(c => `<td style="font-size:11px;">${r[c] ?? '—'}</td>`).join('')}</tr>`).join('')}</tbody>
+    </table></div>
+    <p style="font-size:11px;color:var(--text3);margin-top:8px;">Showing ${Math.min(rows.length, 15)} of ${window._lastSpData.length} rows fetched from SharePoint.</p>`;
+  } else {
+    spPanel.style.display = 'none';
+  }
+
+  // jira stories
+  const jiraEl = document.getElementById('d-jira');
+  if (!sortedStories.length) {
+    jiraEl.innerHTML = `<p style="font-size:12px;color:var(--text3);padding:1rem 0;">No Jira stories loaded. Connect Jira or upload a Jira CSV export to see stories here.</p>`;
+  } else {
+    const statusPill = s => {
+      const sl = (s||'').toLowerCase();
+      if (sl.includes('done')||sl.includes('closed')||sl.includes('complete')) return 'pill-done';
+      if (sl.includes('progress')||sl.includes('review')) return 'pill-prog';
+      if (sl.includes('block')) return 'pill-block';
+      return 'pill-todo';
+    };
+    jiraEl.innerHTML = `<table class="jira-table">
+      <thead><tr>
+        <th style="cursor:pointer;" onclick="setJiraSort('key')">Key${getSortIndicator('key')}</th>
+        <th style="cursor:pointer;" onclick="setJiraSort('title')">Story${getSortIndicator('title')}</th>
+        <th style="cursor:pointer;" onclick="setJiraSort('status')">Status${getSortIndicator('status')}</th>
+        <th style="cursor:pointer;" onclick="setJiraSort('assignee')">Assignee${getSortIndicator('assignee')}</th>
+        <th style="cursor:pointer;" onclick="setJiraSort('priority')">Priority${getSortIndicator('priority')}</th>
+        <th style="cursor:pointer;" onclick="setJiraSort('due_date')">Due${getSortIndicator('due_date')}</th>
+        <th style="cursor:pointer;" onclick="setJiraSort('labels')">Tags${getSortIndicator('labels')}</th>
+      </tr></thead>
+      <tbody>` +
+      sortedStories.map(s => `
+        <tr>
+          <td><span class="jira-key">${s.key||'-'}</span></td>
+          <td><span class="story-title">${s.title||''}</span></td>
+          <td><span class="pill ${statusPill(s.status)}">${s.status||'To Do'}</span></td>
+          <td style="font-size:11px;color:var(--text2);">${s.assignee||'—'}</td>
+          <td style="font-size:11px;color:var(--text3);">${s.priority||'—'}</td>
+          <td style="font-size:11px;color:var(--text2);">${formatFriendlyDate(s.due_date || s.dueDate || '')}</td>
+          <td style="font-size:11px;color:var(--text3);">${getStoryLabels(s).slice(0, 4).join(', ') || '—'}</td>
+        </tr>`).join('') + `</tbody></table>`;
+  }
+
+  // insights
+  document.getElementById('d-insights').innerHTML = (d.insights||[]).map(i =>
+    `<div class="insight-item"><span class="insight-icon">${i.icon||'💡'}</span><span>${i.text||''}</span></div>`
+  ).join('');
+  renderActionPlan(d.insights || []);
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function showError(msg) {
+  const b = document.getElementById('error-box');
+  b.textContent = '⚠ ' + msg;
+  b.style.display = 'block';
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+initSetupUi();
+>>>>>>> bd85f8826a50f489d4c72f414c76f97e67ced4e9
 </script>
 </body>
 </html>
